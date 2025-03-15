@@ -13,11 +13,10 @@ COPY . .
 RUN npm run build 
 
 
-FROM nginx:1.22-alpine
+FROM nginxinc/nginx-unprivileged:1.23-alpine-perl
 
 COPY nginx.conf /etc/ngnix/conf.d/default.conf
 
 COPY --from=build usr/src/app/dist/  usr/share/nginx/html
 
-EXPOSE 80
-
+EXPOSE 8080
