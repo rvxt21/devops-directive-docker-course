@@ -2,6 +2,8 @@ FROM golang:1.19-buster as build
 
 WORKDIR /app
 
+RUN useradd -u 1001 nonroot
+
 COPY go.mod go.sum ./
 
 RUN --mount=type=cache,target=/go/pkg/mod \
@@ -19,7 +21,11 @@ FROM scratch
 
 ENV GIN_MODE release
 
+COPY --from=build /etc/passwd /etc/passwd
+
 COPY --from=build /app/api-golang api-golang
+
+USER nonroot
 
 EXPOSE 8080 
 
