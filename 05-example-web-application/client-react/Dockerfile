@@ -1,7 +1,23 @@
-FROM node
+FROM node:19.4-bullseye as build
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN --mount=type=cache,target=/usr/src/app.npm \
+    npm set cache /usr/src/app.npm && \ 
+    npm ci
 
 COPY . .
 
-RUN npm install
+RUN npm run build 
 
-CMD ["npm","run","dev"]
+
+FROM nginx:1.22-alpine
+
+COPY nginx.conf /etc/ngnix/conf.d/default.conf
+
+COPY --from=build usr/src/app/dist/  usr/share/nginx/html
+
+EXPOSE 80
+
